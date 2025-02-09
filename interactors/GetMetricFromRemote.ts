@@ -8,7 +8,7 @@ const getMetricFromRemote = (url: string, selectedCategories: string[], selected
                 id: data.id,
                 url: data.lighthouseResult.requestedUrl,
                 accessibility_metric: data.lighthouseResult.categories?.accessibility?.score,
-                best_practices_metric: data.lighthouseResult.categories?.best_practices?.score,
+                best_practices_metric: data.lighthouseResult.categories?.['best-practices']?.score,
                 performance_metric: data.lighthouseResult.categories?.performance?.score,
                 seo_metric: data.lighthouseResult.categories?.seo?.score,
                 pwa_metric: data.lighthouseResult.categories?.pwa?.score,

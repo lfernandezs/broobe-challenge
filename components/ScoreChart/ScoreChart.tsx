@@ -38,7 +38,7 @@ const ScoreChart = ({ title, score }: IScoreChartProps) => {
                         }}
                         hideLegend={true}
                     />
-                    <Text style={styles.score}>{score * 100}%</Text>
+                    <Text style={styles.score}>{Math.floor(score * 100)}%</Text>
                 </View>
             </View>
             }

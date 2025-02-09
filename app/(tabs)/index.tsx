@@ -13,6 +13,7 @@ import {
   RadioButton,
   Searchbar,
   SegmentedButtons,
+  Snackbar,
   Text,
 } from 'react-native-paper';
 import getMetricFromRemote from '@/interactors/GetMetricFromRemote';
@@ -36,6 +37,7 @@ const HomeScreen = () => {
   const [current, setHistory] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isMetricSaved, setIsMetricSaved] = useState(false);
 
   const selectedCategories = Object.entries(isCategorySelected)
     .filter(([_, isSelected]) => isSelected)
@@ -70,13 +72,17 @@ const HomeScreen = () => {
     setIsLoading(true);
     getMetricFromRemote(urlWithProtocol, selectedCategories, selectedStrategy)
       .then((data) => setMetricProps(data))
-      .catch((error) => setError(error))
+      .catch((error) => setError(ERROR_MESSAGE_GENERIC))
       .finally(() => setIsLoading(false));
   }
 
   const onSaveMetric = async () => {
     if (!metricProps) return;
-    await addMetricToStore.execute(metricProps);
+    addMetricToStore.execute(metricProps)
+      .then(() => {
+        setIsMetricSaved(true);
+      })
+      .catch((error) => setError(ERROR_MESSAGE_GENERIC));
   }
 
   return (
@@ -88,6 +94,7 @@ const HomeScreen = () => {
             onChangeText={(text) => setUrl(text.toLowerCase())}
             value={url}
             onIconPress={onSearch}
+            onSubmitEditing={onSearch}
           />
 
           <View style={styles.categoryContainer}>
@@ -120,8 +127,8 @@ const HomeScreen = () => {
 
           {error && <Text style={styles.error}>{error}</Text>}
           <View style={styles.chartsContainer}>
-            {metricProps && selectedCategories.map((category) => (
-              <ScoreChart key={category} title={category} score={metricProps[`${category}_metric`]} />
+            {metricProps && CATEGORIES.map((category) => (
+              <ScoreChart key={category.name} title={category.name} score={metricProps[`${category.value}_metric`]} />
             ))}
           </View>
 
@@ -129,6 +136,12 @@ const HomeScreen = () => {
             Save metric
           </Button>
           }
+
+          <Snackbar duration={2000}
+            visible={isMetricSaved}
+            onDismiss={() => setIsMetricSaved(false)}>
+            Metric saved successfully!
+          </Snackbar>
         </View>
       </KeyboardAwareScrollView>
     </SafeAreaView>
