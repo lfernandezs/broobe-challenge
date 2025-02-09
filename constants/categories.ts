@@ -2,9 +2,10 @@
 
 const CATEGORIES = [
     { name: 'Accessibility', value: 'accessibility' },
-    { name: 'Best Practices', value: 'best-practices' },
+    { name: 'Best Practices', value: 'best_practices' },
     { name: 'Performance', value: 'performance' },
     { name: 'PWA', value: 'pwa' },
+    { name: 'SEO', value: 'seo' }
 ]
 
 export default CATEGORIES
