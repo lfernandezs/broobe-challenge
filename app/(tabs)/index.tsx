@@ -2,7 +2,7 @@ if (__DEV__) {
   require("../../ReactotronConfig");
 }
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CATEGORIES from '@/constants/categories';
 import STRATEGIES from '@/constants/strategies';
 import { StyleSheet, View } from 'react-native';
@@ -15,16 +15,21 @@ import {
   SegmentedButtons,
   Text,
 } from 'react-native-paper';
-import getMetrics from '@/interactors/getMetrics';
+import getMetricFromRemote from '@/interactors/GetMetricFromRemote';
+import AddMetricToStore from '@/interactors/AddMetricToStore';
+import { useRootStore } from '@/providers/RootStoreProvider';
+import { observer } from 'mobx-react-lite';
+import Metric from '@/entities/Metric/Metric';
 
-export default function HomeScreen() {
+const HomeScreen = () => {
 
   const [url, setUrl] = useState('');
   const [isCategorySelected, setCategories] = useState(
     Object.fromEntries(CATEGORIES.map((category) => [category.value, false]))
   )
   const [selectedStrategy, setStrategy] = useState('mobile');
-  const [metrics, setMetrics] = useState(null);
+  const [metric, setMetric]: [Metric | null, any] = useState(null);
+  const [current, setHistory] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -32,15 +37,22 @@ export default function HomeScreen() {
     .filter(([_, isSelected]) => isSelected)
     .map(([category, _]) => category)
 
+  const { metricsStore } = useRootStore();
+  const addMetricToStore = new AddMetricToStore(metricsStore);
+
   const onSearch = () => {
     setIsLoading(true);
-    getMetrics(url, selectedCategories, selectedStrategy)
-      .then((data) => setMetrics(data))
+    getMetricFromRemote(url, selectedCategories, selectedStrategy)
+      .then((data) => setMetric(data))
       .catch((error) => setError(error))
       .finally(() => setIsLoading(false));
   }
 
-  console.log('metrics', metrics);
+  const onSaveMetric = async () => {
+    if (!metric) return;
+    await addMetricToStore.execute(metric);
+  }
+
   return (
     <View style={styles.container}>
       <Searchbar
@@ -80,15 +92,18 @@ export default function HomeScreen() {
 
       {error && <Text>{error}</Text>}
 
-      {metrics && Object.entries(metrics).map(([category, data]) => (
+      {metric && selectedCategories.map((category) => (
         <View key={category}>
-          <Text>{category}: {data.score}</Text>
+          <Text>{metric.id} - {metric.url} - {metric.accessibility_metric} - {metric.best_practices_metric}</Text>
         </View>
       ))}
 
-      <Button>
-        Save metrics
+      <Button onPress={onSaveMetric}>
+        Save metric
       </Button>
+
+      <Text>Saved Metric</Text>
+      {metricsStore.current && <Text>{JSON.stringify(metricsStore.current)}</Text>}
     </View >
   );
 }
@@ -100,3 +115,5 @@ const styles = StyleSheet.create({
     padding: 8,
   },
 });
+
+export default observer(HomeScreen);
