@@ -2,7 +2,7 @@ import MetricsStore from "@/stores/MetricsStore/MetricsStore";
 import { makeAutoObservable } from "mobx";
 
 
-export default class getMetricFromRemoteFromStore {
+export default class getMetricsFromRemoteFromStore {
     private _metricsStore: MetricsStore;
 
     constructor(metricsStore: MetricsStore) {
@@ -10,7 +10,7 @@ export default class getMetricFromRemoteFromStore {
         makeAutoObservable(this);
     }
 
-    execute() {
-        return this._metricsStore.all;
+    async execute() {
+        return await this._metricsStore.all;
     }
 }

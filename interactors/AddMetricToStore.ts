@@ -1,4 +1,5 @@
 import Metric from "@/entities/Metric/Metric";
+import { IMetricProps } from "@/entities/Metric/Metric.types";
 import MetricsStore from "@/stores/MetricsStore/MetricsStore";
 import { makeAutoObservable } from "mobx";
 
@@ -10,8 +11,13 @@ export default class AddMetricToStore {
         makeAutoObservable(this);
     }
 
-    async execute(metric: Metric): Promise<string> {
-        await this._metricsStore.add(metric);
-        return metric.id;
+    async execute(metricProps: IMetricProps): Promise<string | void> {
+        try {
+            const metric = new Metric({ ...metricProps, id: this._metricsStore.nextId });
+            await this._metricsStore.add(metric);
+            return metric.id;
+        } catch (error) {
+            console.error(error);
+        }
     }
 }

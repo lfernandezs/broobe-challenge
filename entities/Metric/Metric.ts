@@ -11,16 +11,16 @@ export default class Metric {
     _strategy_id: IMetricProps['strategy_id'];
     _created_at: IMetricProps['created_at'];
 
-    constructor(data: any) {
+    constructor(data: IMetricProps) {
         this._id = data.id;
-        this._url = data.lighthouseResult.requestedUrl;
-        this._accessibility_metric = data.lighthouseResult.categories?.accessibility?.score;
-        this._best_practices_metric = data.lighthouseResult.categories?.['best-practices']?.score;
-        this._performance_metric = data.lighthouseResult.categories?.performance?.score;
-        this._seo_metric = data.lighthouseResult.categories?.seo?.score;
-        this._pwa_metric = data.lighthouseResult.categories?.pwa?.score;
-        this._strategy_id = data.strategy_id;
-        this._created_at = data.created_at;
+        this._url = data.url;
+        this._accessibility_metric = data?.accessibility_metric;
+        this._best_practices_metric = data?.best_practices_metric;
+        this._performance_metric = data?.performance_metric;
+        this._seo_metric = data?.seo_metric;
+        this._pwa_metric = data?.pwa_metric;
+        this._strategy_id = data?.strategy_id;
+        this._created_at = data?.created_at;
     }
 
     get id() {

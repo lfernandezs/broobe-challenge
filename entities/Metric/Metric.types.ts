@@ -1,16 +1,11 @@
 export interface IMetricProps {
     id: string
     url: string
-    accessibility_metric: categoryMetric
-    pwa_metric: categoryMetric
-    performance_metric: categoryMetric
-    seo_metric: categoryMetric
-    best_practices_metric: categoryMetric
+    accessibility_metric: string
+    pwa_metric: string
+    performance_metric: string
+    seo_metric: string
+    best_practices_metric: string
     strategy_id: string
     created_at: Date
-    updated_at: Date
-}
-
-export interface categoryMetric {
-    score: number
 }

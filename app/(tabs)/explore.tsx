@@ -1,97 +1,88 @@
-import { StyleSheet, Image, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Image, Platform, View, Text } from 'react-native';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useRootStore } from '@/providers/RootStoreProvider';
+import Metric from '@/entities/Metric/Metric';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+import { Button, Icon } from 'react-native-paper';
+import { observer } from 'mobx-react-lite';
+import getMetricsFromRemoteFromStore from '@/interactors/GetMetricsFromStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function TabTwoScreen() {
+const History = () => {
+  const { metricsStore } = useRootStore();
+  const getMetricsFromStore = new getMetricsFromRemoteFromStore(metricsStore);
+  const [metrics, setMetrics] = useState<any>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchData = async () => {
+      const metrics = await getMetricsFromStore.execute();
+      setMetrics(metrics);
+      setLoading(false);
+    }
+    fetchData();
+  }, [metricsStore.metrics]);
+
+  const onDelete = async (id: string) => {
+    await metricsStore.delete(id);
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user's current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <SafeAreaView style={{ flex: 1 }}>
+      <KeyboardAwareScrollView style={{ flex: 1 }}>
+        {!loading && <View style={{ margin: 16 }}>
+          <ThemedText style={styles.title}>History</ThemedText>
+          {metrics.map((metric: Metric, index: number) => (
+            <View key={metric.id} style={styles.metricCard}>
+              <View style={styles.titleContainer}>
+                <ThemedText style={styles.metricId}>#{index + 1}</ThemedText>
+                <Button style={styles.button} icon={"trash-can"} onPress={() => onDelete(metric.id)} />
+              </View>
+              <View>
+                <ThemedText style={{ fontSize: 18, color: 'grey' }}>{metric.url}</ThemedText>
+                {/* <ThemedText style={{ color: '#808080' }}>{metric.created_at}</ThemedText> */}
+              </View>
+              <View style={styles.categoriesContainer}>
+                {metric.accessibility_metric &&
+                  <View style={styles.categoryContainer}>
+                    <ThemedText style={styles.categoryTitle}>Accessibility</ThemedText>
+                    <ThemedText>{metric.accessibility_metric}</ThemedText>
+                  </View>
+                }
+                {metric.best_practices_metric &&
+                  <View style={styles.categoryContainer}>
+                    <ThemedText style={styles.categoryTitle}>Best Practices</ThemedText>
+                    <ThemedText>{metric.best_practices_metric}</ThemedText>
+                  </View>
+                }
+                {metric.performance_metric &&
+                  <View style={styles.categoryContainer}>
+                    <ThemedText style={styles.categoryTitle}>Performance</ThemedText>
+                    <ThemedText>{metric.performance_metric}</ThemedText>
+                  </View>
+                }
+                {metric.pwa_metric &&
+                  <View style={styles.categoryContainer}>
+                    <ThemedText style={styles.categoryTitle}>PWA</ThemedText>
+                    <ThemedText>{metric.pwa_metric}</ThemedText>
+                  </View>
+                }
+                {metric.seo_metric &&
+                  <View style={styles.categoryContainer}>
+                    <ThemedText style={styles.categoryTitle}>SEO</ThemedText>
+                    <ThemedText>{metric.seo_metric}</ThemedText>
+                  </View>
+                }
+              </View>
+            </View>
+          ))}
+        </View>}
+      </KeyboardAwareScrollView>
+    </SafeAreaView >
   );
 }
 
@@ -102,8 +93,45 @@ const styles = StyleSheet.create({
     left: -35,
     position: 'absolute',
   },
+  metricId: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    margin: 16,
+  },
+  metricCard: {
+    borderRadius: 8,
+    borderColor: '#e0e0e0',
+    borderWidth: 1,
+    padding: 16,
+    marginBottom: 16,
+  },
+  categoriesContainer: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  categoryContainer: {
+    flex: 1,
+  },
+  categoryTitle: {
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  button: {
+  },
+  buttonIcon: {
+    marginRight: 8,
   },
 });
+
+export default observer(History);

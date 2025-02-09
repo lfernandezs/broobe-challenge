@@ -7,8 +7,9 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { observer } from 'mobx-react-lite';
 
-export default function TabLayout() {
+const TabLayout = () => {
   const colorScheme = useColorScheme();
 
   return (
@@ -43,3 +44,5 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+export default observer(TabLayout);
