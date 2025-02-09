@@ -5,7 +5,7 @@ if (__DEV__) {
 import React, { useEffect, useState } from 'react';
 import CATEGORIES from '@/constants/categories';
 import STRATEGIES from '@/constants/strategies';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import {
   ActivityIndicator,
   Button,
@@ -34,7 +34,6 @@ const HomeScreen = () => {
   )
   const [selectedStrategy, setStrategy] = useState('mobile');
   const [metricProps, setMetricProps]: [Metric | null, any] = useState(null);
-  const [current, setHistory] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isMetricSaved, setIsMetricSaved] = useState(false);

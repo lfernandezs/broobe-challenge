@@ -18,7 +18,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignContent: 'center',
         justifyContent: 'center',
-        borderColor: 'white',
     },
 
     score: {

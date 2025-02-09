@@ -35,6 +35,8 @@ const ScoreChart = ({ title, score }: IScoreChartProps) => {
                         chartConfig={{
                             decimalPlaces: 2,
                             color: (opacity = 1) => colorRange(score, opacity),
+                            backgroundGradientToOpacity: 0,
+                            backgroundGradientFromOpacity: 0,
                         }}
                         hideLegend={true}
                     />
