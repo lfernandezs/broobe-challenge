@@ -24,7 +24,7 @@ import Metric from '@/entities/Metric/Metric';
 import ScoreChart from '@/components/ScoreChart/ScoreChart';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { set } from 'mobx';
+import ERROR_MESSAGE_GENERIC from '@/constants/error_message';
 
 const HomeScreen = () => {
 
@@ -50,7 +50,6 @@ const HomeScreen = () => {
     const urlPattern = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
     if (!url) return false;
     if (!url.match(urlPattern)) {
-      console.log(url);
       return false;
     }
     return true;
@@ -63,6 +62,7 @@ const HomeScreen = () => {
 
   const onSearch = () => {
     setError('');
+    setMetricProps(null);
     if (!validateUrl(url)) {
       setError('Invalid URL');
       return;

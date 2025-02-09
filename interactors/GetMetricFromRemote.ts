@@ -16,7 +16,9 @@ const getMetricFromRemote = (url: string, selectedCategories: string[], selected
                 created_at: data.created_at,
             }
         })
-        .catch((error) => console.error(error))
+        .catch((error) => {
+            return Promise.reject(error);
+        });
 }
 
 export default getMetricFromRemote;
