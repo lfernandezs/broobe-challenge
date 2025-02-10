@@ -1,7 +1,7 @@
 import api from "./api";
 
 // TODO: Pasarlo a una env variable
-const API_KEY = 'process.env.EXPO_PUBLIC_API_KEY';
+const API_KEY = process.env.EXPO_PUBLIC_API_KEY;
 
 const fetchMetrics = async (url: string, categories: string[], strategy: string) => {
     const response = await api.get('/', {
